@@ -1,1 +1,1 @@
-# Dense-aware-normalizaion-for-3D-bench
+# Dense-aware normalization for 3D benchmark

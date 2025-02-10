@@ -1,0 +1,110 @@
+{
+    "in-SC-2021-0806b-Indoor1": {
+        "confidential": "234c63d2-b58e-4d9c-9c8e-20b742df1afe",
+        "set": "train"
+    },
+    "in-SC-2021-0806b-Indoor2": {
+        "confidential": "d7ea59a4-f6d0-4a55-ab89-df09a0a4204b",
+        "set": "train"
+    },
+    "in-SC-2021-1223-14": {
+        "confidential": "7bd5d1a9-8f95-46f6-84ab-5e010da7d818",
+        "set": "train"
+    },
+    "in-SC-2021-1223-15": {
+        "confidential": "c5fff06d-1bd2-44b1-b785-bf7b655274d3",
+        "set": "train"
+    },
+    "in-SC-2021-1223-16": {
+        "confidential": "6918afde-9d73-494b-a3f0-53a8979f00b0",
+        "set": "train"
+    },
+    "in-SC-2021-1223-17": {
+        "confidential": "1b207136-699a-4079-a43b-2801fa7b6fd9",
+        "set": "test"
+    },
+    "in-SC-2021-1223-18": {
+        "confidential": "dc3eff31-da9d-4dc7-aeee-1ec3969dbc4a",
+        "set": "test"
+    },
+    "in-SC-2021-1223-19": {
+        "confidential": "58ce141c-448b-4192-822f-5ae9c2c4df24",
+        "set": "train"
+    },
+    "in-SC-2021-1223-20": {
+        "confidential": "3db60790-22f6-4f9e-be53-88cdc08474e5",
+        "set": "train"
+    },
+    "in-SC-2021-1223-21": {
+        "confidential": "0a92e569-daf9-4d7a-8505-8fd0e6302379",
+        "set": "train"
+    },
+    "in-SC-2021-1223-22": {
+        "confidential": "da6c725d-dfb1-4f10-b851-bc6e67af92d1",
+        "set": "test"
+    },
+    "in-SC-2021-1223-23": {
+        "confidential": "61842097-4513-4a5b-8752-7fec2a56908c",
+        "set": "train"
+    },
+    "in-SC-2021-1223-24": {
+        "confidential": "e3a0d527-8265-4ab1-bf8a-49315d3d3a09",
+        "set": "test"
+    },
+    "in-SC-2021-1223-25": {
+        "confidential": "83967d29-a919-4280-989c-a72e2aa11495",
+        "set": "train"
+    },
+    "in-SC-2021-1223-26": {
+        "confidential": "e66d583e-0ecc-41d7-823a-f12f57bcc58e",
+        "set": "test"
+    },
+    "in-SC-2021-1223-27": {
+        "confidential": "1586c2f3-408c-4040-9a78-ff7f1efea80c",
+        "set": "train"
+    },
+    "in-SC-2021-1223-28": {
+        "confidential": "325adb84-7109-407e-b974-9bb413f04e58",
+        "set": "train"
+    },
+    "in-SC-2021-1224-32": {
+        "confidential": "8ee97e84-33c6-49cd-8bd7-1ee690dc0f61",
+        "set": "train"
+    },
+    "in-SC-2021-1224-33": {
+        "confidential": "56968a25-d43b-4434-9533-51282a09f1d1",
+        "set": "train"
+    },
+    "in-SC-2021-1224-34": {
+        "confidential": "687be56f-1114-46b2-b81f-665bdec55024",
+        "set": "train"
+    },
+    "in-SC-2021-1224-35": {
+        "confidential": "4fd0d607-515b-433a-a132-d8c7111eda70",
+        "set": "test"
+    },
+    "in-SC-2021-1224-36": {
+        "confidential": "a8b9cb3e-e61a-4b26-b2a3-ac17705f1184",
+        "set": "train"
+    },
+    "in-SC-2021-1224-37": {
+        "confidential": "843773ed-0216-42ee-92b0-a935031e30e2",
+        "set": "train"
+    },
+    "in-SC-2021-1224-38": {
+        "confidential": "9df63561-b712-4ade-a9ce-88c6c1f65625",
+        "set": "None"
+    },
+    "in-SC-2021-1224-39": {
+        "confidential": "3c92b9f0-591b-4ad1-86b5-dae1ea99907a",
+        "set": "train"
+    },
+    "in-SC-2021-1224-40": {
+        "confidential": "b5a85b0a-4ade-4e39-bc0a-09af8560f0f3",
+        "set": "train"
+    },
+    "in-SC-2021-1224-41": {
+        "confidential": "c617bfaa-b82e-42de-9821-37cf0f12a4aa",
+        "set": "train"
+    }
+}
