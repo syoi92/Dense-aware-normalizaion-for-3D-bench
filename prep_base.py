@@ -10,16 +10,17 @@ import open3d as o3d
 
 def main():
     # indoor prep-base (11) xyzrgbInsNor
-    root = "../data/wip/cnstpcim_indoor"
-    output = "../data/wip/cnstpcim_indoor_prep1"
+    root = "../data/cnstpcim_indoor"
+    output = "../data/cnst_base"
     data_confidential_json = './data_confidential.json'
 
     anno_prep(root, output, label = "cnst_labell.json")
-    data_split(output, data_confidential_json)
+    data_split(output, data_confidential_json, rename_files=True)
 
 
 
-def data_split(source_folder, json_file, rename_files=True):
+
+def data_split(source_folder, json_file, rename_files=False):
     # Load JSON mapping
     with open(json_file, "r") as f:
         file_mapping = json.load(f)
@@ -39,6 +40,7 @@ def data_split(source_folder, json_file, rename_files=True):
 
                 # Ignore cases where set is "None"
                 if set_type is None or set_type.lower() == "none":
+                    os.remove(pth_file)
                     continue
 
                 # Extract suffix (e.g., "_a1.pth") & Determine new filename
@@ -63,7 +65,7 @@ def anno_prep(root, output, i_intensity = False, i_ins=True, i_normals = True, l
     with open(os.path.join(root, label), "r") as f:
         cnst_label = json.load(f)
         class_num = sum(1 for value in cnst_label.values() if value.get("indexed"))
-        print(cnst_label)
+        print(f"# of class: {class_num}")
     
     if not os.path.isdir(output):
         os.mkdir(output)
@@ -122,10 +124,10 @@ def anno_prep(root, output, i_intensity = False, i_ins=True, i_normals = True, l
             writePthDict(pcd_a2, os.path.join(output,fn+'_a2.pth'))
             writePthDict(pcd_a3, os.path.join(output,fn+'_a3.pth'))
             writePthDict(pcd_a4, os.path.join(output,fn+'_a4.pth'))
-            print(len(pcd[ind_A1, :]), 'a1-done')
-            print(len(pcd[ind_A2, :]), 'a2-done')
-            print(len(pcd[ind_A3, :]), 'a3-done')
-            print(len(pcd[ind_A4, :]), 'a4-done')
+            print(len(pcd_a1), 'a1-done')
+            print(len(pcd_a2), 'a2-done')
+            print(len(pcd_a3), 'a3-done')
+            print(len(pcd_a4), 'a4-done')
         
         print(fn, pcd.shape, '-done')
 
