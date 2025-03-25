@@ -45,7 +45,7 @@
         "indexed": true
     },
     "5": {
-        "name": "frame",
+        "name": "ladder",
         "color": [
             0.596078431372549,
             0.8745098039215686,
@@ -54,7 +54,7 @@
         "indexed": true
     },
     "6": {
-        "name": "ladder",
+        "name": "stair",
         "color": [
             0.8392156862745098,
             0.15294117647058825,
@@ -63,13 +63,13 @@
         "indexed": true
     },
     "7": {
-        "name": "stair",
+        "name": "frame",
         "color": [
             1.0,
             0.596078431372549,
             0.5882352941176471
         ],
-        "indexed": true
+        "indexed": false
     },
     "8": {
         "name": "lift",
@@ -204,6 +204,6 @@
             0.9215686274509803,
             0.7725490196078432
         ],
-        "indexed": true
+        "indexed": false
     }
 }

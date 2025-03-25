@@ -33,7 +33,7 @@ def color_legend(class_json, output):
 
 def main():
     json_data = 'cnst_labell.json'
-    output = './color_legend.png'
+    output = './temp/color_legend.png'
 
     with open(json_data, 'r') as file:
         class_json = json.load(file)

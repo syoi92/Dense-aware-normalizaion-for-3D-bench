@@ -8,13 +8,13 @@ import json
 import open3d as o3d
 
 
-def main():
-    # indoor prep-base (11) xyzrgbInsNor
-    root = "../data/cnstpcim_indoor"
-    output = "../data/cnst_base"
+def main(root, output, resol):
+    # root = "../data/cnstpcim_indoor"
+    # output = "../data/cnst_base"
     data_confidential_json = './data_confidential.json'
 
-    anno_prep(root, output, label = "cnst_labell.json")
+    # indoor prep-base (11) xyzrgbInsNor
+    anno_prep(root, output, resolution = resol, label = "cnst_labell.json")
     data_split(output, data_confidential_json, rename_files=True)
 
 
@@ -61,7 +61,7 @@ def data_split(source_folder, json_file, rename_files=False):
                 break  # Stop checking once a match is found
 
 
-def anno_prep(root, output, i_intensity = False, i_ins=True, i_normals = True, label = "cnst_labell.json"):
+def anno_prep(root, output, resolution= 0.01, i_intensity = False, i_ins=True, i_normals = True, label = "cnst_labell.json"):
     with open(os.path.join(root, label), "r") as f:
         cnst_label = json.load(f)
         class_num = sum(1 for value in cnst_label.values() if value.get("indexed"))
@@ -115,10 +115,10 @@ def anno_prep(root, output, i_intensity = False, i_ins=True, i_normals = True, l
             ind_A3 = np.logical_and(pcd[:,0] < 0, pcd[:,1] < 0)
             ind_A4 = np.logical_and(pcd[:,0] > 0, pcd[:,1] < 0)
             
-            pcd_a1 = downsample(pcd[ind_A1, :], resolution=0.01)
-            pcd_a2 = downsample(pcd[ind_A2, :], resolution=0.01)
-            pcd_a3 = downsample(pcd[ind_A3, :], resolution=0.01)
-            pcd_a4 = downsample(pcd[ind_A4, :], resolution=0.01)
+            pcd_a1 = downsample(pcd[ind_A1, :], resolution=resolution)
+            pcd_a2 = downsample(pcd[ind_A2, :], resolution=resolution)
+            pcd_a3 = downsample(pcd[ind_A3, :], resolution=resolution)
+            pcd_a4 = downsample(pcd[ind_A4, :], resolution=resolution)
            
             writePthDict(pcd_a1, os.path.join(output,fn+'_a1.pth'))
             writePthDict(pcd_a2, os.path.join(output,fn+'_a2.pth'))
@@ -180,8 +180,12 @@ def normal_estimate(pcd):
     return np.array(cloud.normals)
 
 
-  
-
-
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) < 3:
+        print("Usage: python script.py <input_point_cloud_folder> <output_folder> <const>")
+    else:
+        root = sys.argv[1]
+        output = sys.argv[2]
+        resol = sys.argv[3]
+        main(root, output, resol)
