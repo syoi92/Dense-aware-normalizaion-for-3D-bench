@@ -6,7 +6,7 @@ from glob import glob
 import pandas as pd
 import json
 import open3d as o3d
-
+from tqdm import tqdm
 
 def main(root, output, resol):
     # root = "../data/cnstpcim_indoor"
@@ -14,9 +14,8 @@ def main(root, output, resol):
     data_confidential_json = './data_confidential.json'
 
     # indoor prep-base (11) xyzrgbInsNor
-    anno_prep(root, output, resolution = resol, label = "cnst_labell.json")
+    anno_prep(root, output, resolution = float(resol), label = "cnst_labell.json")
     data_split(output, data_confidential_json, rename_files=True)
-
 
 
 
@@ -64,8 +63,8 @@ def data_split(source_folder, json_file, rename_files=False):
 def anno_prep(root, output, resolution= 0.01, i_intensity = False, i_ins=True, i_normals = True, label = "cnst_labell.json"):
     with open(os.path.join(root, label), "r") as f:
         cnst_label = json.load(f)
-        class_num = sum(1 for value in cnst_label.values() if value.get("indexed"))
-        print(f"# of class: {class_num}")
+        indexed_names = [item['name'] for item in cnst_label.values() if item['indexed']]
+        print(indexed_names, f", # of class: {len(indexed_names)}")
     
     if not os.path.isdir(output):
         os.mkdir(output)
@@ -73,7 +72,7 @@ def anno_prep(root, output, resolution= 0.01, i_intensity = False, i_ins=True, i
     paths = glob(os.path.join(root, "*/"))
     paths.sort()
 
-    for path in paths:
+    for path in tqdm(paths):
         fn = os.path.basename(os.path.normpath(path))
         annos = glob(os.path.join(path, 'Annotation', '*.txt'))
         

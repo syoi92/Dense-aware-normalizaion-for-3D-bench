@@ -1,26 +1,60 @@
-import numpy as np
 import open3d as o3d
-import pandas as pd
+import numpy as np
 from sklearn.cluster import DBSCAN
+from sklearn.mixture import GaussianMixture
+from sklearn.neighbors import NearestNeighbors
 import os
+import time
 
-def estimate_density_convex_hull(points):
-    if len(points) >= 4:
-        hull = ConvexHull(points)
-        volume = hull.volume
-        density = len(points) / volume if volume != 0 else 0
-        return density
-    return 0
+# Load point cloud from PLY file
+def load_point_cloud(file_path):
+    pcd = o3d.io.read_point_cloud(file_path)
+    points = np.asarray(pcd.points)
+    return pcd, points
 
-def estimate_density_knn(points, k=10):
-    if len(points) > k:
-        nbrs = NearestNeighbors(n_neighbors=k).fit(points)
-        distances, _ = nbrs.kneighbors(points)
-        r = np.mean(distances[:, 1:], axis=1)  # Exclude the distance to itself
-        local_density = k / ((4/3) * np.pi * r**3)
-        return np.mean(local_density)
-    return 0
+# Octree-based density zoning
+def octree_density_zones(points, max_depth=4):
+    # octree = o3d.geometry.Octree(max_depth=max_depth)
+    # pcd = o3d.geometry.PointCloud()
+    # pcd.points = o3d.utility.Vector3dVector(points)
+    # octree.convert_from_point_cloud(pcd, size_expand=0.01)
+    # return octree
 
+    octree = o3d.geometry.Octree(max_depth=max_depth)
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    octree.convert_from_point_cloud(pcd, size_expand=0.01)
+    labels = np.zeros(len(points), dtype=int)
+    zone_id = 0
+
+    def assign_zone(node, node_info):
+        nonlocal zone_id
+        if isinstance(node, o3d.geometry.OctreeLeafNode):
+            for idx in node.indices:
+                labels[idx] = zone_id
+            zone_id += 1
+    
+    octree.traverse(assign_zone)
+    return labels
+
+# DBSCAN-based zoning
+def dbscan_density_zones(points, eps=0.05, min_samples=10):
+    db = DBSCAN(eps=eps, min_samples=min_samples).fit(points)
+    return db.labels_
+
+# GMM-based zoning
+def gmm_density_zones(points, n_components=5):
+    gmm = GaussianMixture(n_components=n_components, random_state=0).fit(points)
+    return gmm.predict(points)
+
+# KNN Density Estimation
+def knn_density_zones(points, n_neighbors=10):
+    nbrs = NearestNeighbors(n_neighbors=n_neighbors).fit(points)
+    distances, _ = nbrs.kneighbors(points)
+    densities = 1 / (np.mean(distances, axis=1) + 1e-10)
+    return np.digitize(densities, np.linspace(np.min(densities), np.max(densities), 6)) - 1
+
+# Visualization function: Assign colors to zones and save PLY files
 def visualize_and_save_zones(points, labels, output_folder, file_name):
     num_zones = len(np.unique(labels))
     colors = np.random.rand(num_zones, 3)  # Generate random colors for each zone
@@ -28,8 +62,6 @@ def visualize_and_save_zones(points, labels, output_folder, file_name):
     # Assign colors based on labels
     colored_points = np.zeros((points.shape[0], 3))
     for i in range(num_zones):
-        if i == -1:  # Skip noise
-            continue
         colored_points[labels == i] = colors[i]
     
     # Create a point cloud with colors
@@ -42,54 +74,52 @@ def visualize_and_save_zones(points, labels, output_folder, file_name):
     o3d.io.write_point_cloud(output_path, pcd)
     print(f"Saved: {output_path}")
 
-def cluster_and_estimate_density(point_cloud, output_folder):
-    labels = DBSCAN(eps=0.05, min_samples=10).fit_predict(point_cloud)
-    unique_labels = set(labels)
+# Function to compare methods and save results
+def compare_methods(input_file, output_folder):
+    pcd, points = load_point_cloud(input_file)
 
-    densities = []
-    for cluster_id in unique_labels:
-        if cluster_id == -1:
-            continue  # Skip noise
+    # Ensure the output folder exists
+    os.makedirs(output_folder, exist_ok=True)
 
-        cluster_points = point_cloud[labels == cluster_id]
+    # Octree method
+    start_time = time.time()
+    octree_labels = octree_density_zones(points, max_depth=4)
+    octree_time = time.time() - start_time
+    visualize_and_save_zones(points, octree_labels, output_folder, "octree_zones.ply")
 
-        # Density estimation using Convex Hull
-        ch_density = estimate_density_convex_hull(cluster_points)
-        
-        # Density estimation using kNN
-        knn_density = estimate_density_knn(cluster_points)
+    # DBSCAN method
+    start_time = time.time()
+    dbscan_labels = dbscan_density_zones(points, eps=0.05, min_samples=10)
+    dbscan_time = time.time() - start_time
+    visualize_and_save_zones(points, dbscan_labels, output_folder, "dbscan_zones.ply")
 
-        densities.append({
-            "cluster_id": cluster_id,
-            "convex_hull_density": ch_density,
-            "knn_density": knn_density,
-            "num_points": len(cluster_points)
-        })
+    # GMM method
+    start_time = time.time()
+    gmm_labels = gmm_density_zones(points, n_components=5)
+    gmm_time = time.time() - start_time
+    visualize_and_save_zones(points, gmm_labels, output_folder, "gmm_zones.ply")
 
-    # Save densities to CSV
-    df = pd.DataFrame(densities)
-    df.to_csv(os.path.join(output_folder, "density_info.csv"), index=False)
+    # KNN method
+    start_time = time.time()
+    knn_zones = knn_density_zones(points, n_neighbors=10)
+    knn_time = time.time() - start_time
+    visualize_and_save_zones(points, knn_zones, output_folder, "knn_zones.ply")
 
-    # Visualize and save the colored zones
-    visualize_and_save_zones(point_cloud, labels, output_folder, "colored_clusters.ply")
+    # Print time results
+    print("\nExecution Times:")
+    print(f"Octree method time: {octree_time:.4f} seconds")
+    print(f"DBSCAN method time: {dbscan_time:.4f} seconds")
+    print(f"GMM method time: {gmm_time:.4f} seconds")
+    print(f"KNN method time: {knn_time:.4f} seconds")
 
-def main(input_file, output_folder):
-    # Ensure output folder exists
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+# Main function
+def main():
+    input_file = "samples/room-17.ply"  # Replace with your own PLY file path
+    output_folder = "samples/output-17"  # Replace with your desired output folder
+    compare_methods(input_file, output_folder)
 
-    # Load the point cloud using Open3D
-    pcd = o3d.io.read_point_cloud(input_file)
-    point_cloud = np.asarray(pcd.points)
-    
-    # Cluster the point cloud and estimate densities
-    cluster_and_estimate_density(point_cloud, output_folder)
-
+# Run the script
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) < 3:
-        print("Usage: python script.py <input_point_cloud_file> <output_folder>")
-    else:
-        input_file = sys.argv[1]
-        output_folder = sys.argv[2]
-        main(input_file, output_folder)
+    main()
+
+
